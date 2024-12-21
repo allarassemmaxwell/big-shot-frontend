@@ -45,25 +45,30 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "6.5.1",
     "ajv": "^8.16.0",
+    "axios": "^1.7.9",
     "bootstrap": "4.6.2",
     "chart.js": "2.9.4",
     "classnames": "2.3.2",
+    "jspdf": "^2.5.2",
+    "jspdf-autotable": "^3.8.4",
     "moment": "2.29.4",
     "nouislider": "15.4.0",
     "react": "18.2.0",
     "react-chartjs-2": "2.11.2",
     "react-copy-to-clipboard": "5.1.0",
+    "react-csv": "^2.2.2",
     "react-datetime": "3.2.0",
     "react-dom": "18.2.0",
+    "react-paginate": "^8.2.0",
     "react-router-dom": "6.21.1",
     "react-scripts": "5.0.1",
     "reactstrap": "8.10.0",
     "sass": "1.69.5"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "gulp": "4.0.2",
-    "gulp-append-prepend": "1.0.9",
-    "cross-env": "^7.0.3"
+    "gulp-append-prepend": "1.0.9"
   },
   "optionalDependencies": {
     "eslint-plugin-flowtype": "8.0.3",
