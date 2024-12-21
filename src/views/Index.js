@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 // node.js library that concatenates classes (strings)
 import classnames from "classnames";
 // javascipt plugin for creating charts
@@ -24,23 +24,14 @@ import Chart from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
 // reactstrap components
 import {
-  Button,
   Card,
   CardHeader,
-  CardBody,
-  CardTitle,
   Table,
   Container,
   Row,
-  Col,
-  Media,
-  Badge,
-  CardFooter,
-Pagination,
-PaginationItem,
-PaginationLink,
 } from "reactstrap";
-
+import axios from 'axios';
+import { BASE_URL, LOADING } from "../constant";
 // core components
 import {
   chartOptions,
@@ -49,11 +40,66 @@ import {
   chartExample2,
 } from "variables/charts.js";
 
-import Header from "components/Headers/Header.js";
+import DashboardNavBar from "components/Dashboard/DashboardNavBar";
+import DashboardItem from "components/Dashboard/DashboardItem";
 
 const Index = (props) => {
-  const [activeNav, setActiveNav] = useState(1);
-  const [chartExample1Data, setChartExample1Data] = useState("data1");
+    const [activeNav, setActiveNav] = useState(1);
+    const [chartExample1Data, setChartExample1Data] = useState("data1");
+
+    const [bets, setBets] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    // State for metrics
+    const [uniqueWinners, setUniqueWinners] = useState(0);
+    const [totalStakes, setTotalStakes] = useState(0);
+    const [totalWonAmount, setTotalWonAmount] = useState(0);
+
+    useEffect(() => {
+        const fetchSms = async () => {
+            try {
+                const response = await axios.get(`${BASE_URL}/bets/`);
+                const betData = response.data;
+
+                // Store all bets
+                setBets(betData);
+
+                // Filter bets where won is true
+                const wonBets = betData.filter((bet) => bet.won);
+
+                // Calculate unique winners using a Set based on phone_number
+                const uniqueWinnerNumbers = new Set(wonBets.map((bet) => bet.phone_number));
+
+                // Calculate total stakes for all bets
+                const totalStakesValue = betData.reduce(
+                    (acc, bet) => acc + parseFloat(bet.stake),
+                    0
+                );
+
+                // Calculate total won amount for bets where won is true
+                const totalWonValue = wonBets.reduce(
+                    (acc, bet) => acc + parseFloat(bet.won_amount),
+                    0
+                );
+
+                // Update state
+                setUniqueWinners(uniqueWinnerNumbers.size);
+                setTotalStakes(totalStakesValue);
+                setTotalWonAmount(totalWonValue);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchSms();
+    }, []);
+
+    if (loading) return <p>{LOADING}</p>;
+    if (error) return <p>Error: {error}</p>;
+
+
 
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
@@ -66,82 +112,12 @@ const Index = (props) => {
     };
     return (
         <>
-            <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
-                <Container fluid>
-                    <div className="header-body">
-                        <Row>
-                            <Col lg="6" xl="4">
-                                <Card className="card-stats mb-4 mb-xl-0">
-                                    <CardBody>
-                                        <Row>
-                                            <div className="col">
-                                                <CardTitle
-                                                tag="h5"
-                                                className="text-uppercase text-muted mb-0"
-                                                >
-                                                Total Stakes
-                                                </CardTitle>
-                                                <span className="h2 font-weight-bold mb-0">
-                                                350,897
-                                                </span>
-                                            </div>
-                                            <Col className="col-auto">
-                                                <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
-                                                <i className="fas fa-chart-bar" />
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </CardBody>
-                                </Card>
-                            </Col>
-                            <Col lg="6" xl="4">
-                                <Card className="card-stats mb-4 mb-xl-0">
-                                    <CardBody>
-                                        <Row>
-                                            <div className="col">
-                                                <CardTitle
-                                                tag="h5"
-                                                className="text-uppercase text-muted mb-0"
-                                                >
-                                                Total wins
-                                                </CardTitle>
-                                                <span className="h2 font-weight-bold mb-0">2,356</span>
-                                            </div>
-                                            <Col className="col-auto">
-                                                <div className="icon icon-shape bg-warning text-white rounded-circle shadow">
-                                                <i className="fas fa-chart-pie" />
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </CardBody>
-                                </Card>
-                            </Col>
-                            <Col lg="6" xl="4">
-                                <Card className="card-stats mb-4 mb-xl-0">
-                                    <CardBody>
-                                        <Row>
-                                            <div className="col">
-                                                <CardTitle
-                                                tag="h5"
-                                                className="text-uppercase text-muted mb-0"
-                                                >
-                                                Total winners
-                                                </CardTitle>
-                                                <span className="h2 font-weight-bold mb-0">924</span>
-                                            </div>
-                                            <Col className="col-auto">
-                                                <div className="icon icon-shape bg-yellow text-white rounded-circle shadow">
-                                                <i className="fas fa-users" />
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </CardBody>
-                                </Card>
-                            </Col>
-                        </Row>
-                    </div>
-                </Container>
-            </div>
+           <DashboardNavBar
+           uniqueWinners={uniqueWinners}
+           totalStakes={totalStakes}
+           totalWonAmount={totalWonAmount}
+           />
+
             {/* Page content */}
             <Container className="mt--7" fluid>
                 <Row>
@@ -153,154 +129,29 @@ const Index = (props) => {
                             <Table className="align-items-center table-flush" responsive>
                                 <thead className="thead-light">
                                     <tr>
-                                    <th scope="col">Name</th>
                                     <th scope="col">Phone Number</th>
-                                    <th scope="col">Transaction Ref</th>
-                                    <th scope="col">Account No</th>
-                                    <th scope="col">Amount</th>
-                                    <th scope="col">Date</th>
+                                    <th scope="col">Chosen Box</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Stake</th>
+                                    <th scope="col">Won Amount</th>
+                                    <th scope="col">Created At</th>
+                                    <th scope="col">Updated At</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <th scope="row">
-                                            <Media className="align-items-center">
-                                            <a
-                                                className="avatar rounded-circle mr-3"
-                                                href="#pablo"
-                                                onClick={(e) => e.preventDefault()}
-                                            >
-                                                <img
-                                                alt="..."
-                                                src={require("../assets/img/theme/profile-cover.jpg")}
-                                                />
-                                            </a>
-                                            <Media>
-                                                <span className="mb-0 text-sm">
-                                                Argon Design System
-                                                </span>
-                                            </Media>
-                                            </Media>
-                                        </th>
-                                        <td>0704205757</td>
-                                        <td>
-                                            <Badge color="" className="badge-dot mr-4">
-                                                S30SJ42
-                                            </Badge>
-                                        </td>
-                                        <td>
-                                            <Badge color="" className="badge-dot mr-4">
-                                            820989732
-                                            </Badge>
-                                        </td>
-                                        <td>
-                                            <Badge color="" className="badge-dot mr-4">
-                                            Ksh 100
-                                            </Badge>
-                                        </td>
-                                        <td>
-                                            <Badge color="" className="badge-dot mr-4">
-                                            06/12/2024
-                                            </Badge>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">
-                                            <Media className="align-items-center">
-                                            <a
-                                                className="avatar rounded-circle mr-3"
-                                                href="#pablo"
-                                                onClick={(e) => e.preventDefault()}
-                                            >
-                                                <img
-                                                alt="..."
-                                                src={require("../assets/img/theme/profile-cover.jpg")}
-                                                />
-                                            </a>
-                                            <Media>
-                                                <span className="mb-0 text-sm">
-                                                Argon Design System
-                                                </span>
-                                            </Media>
-                                            </Media>
-                                        </th>
-                                        <td>0704205757</td>
-                                        <td>
-                                            <Badge color="" className="badge-dot mr-4">
-                                                S30SJ42
-                                            </Badge>
-                                        </td>
-                                        <td>
-                                            <Badge color="" className="badge-dot mr-4">
-                                            820989732
-                                            </Badge>
-                                        </td>
-                                        <td>
-                                            <Badge color="" className="badge-dot mr-4">
-                                            Ksh 100
-                                            </Badge>
-                                        </td>
-                                        <td>
-                                            <Badge color="" className="badge-dot mr-4">
-                                            06/12/2024
-                                            </Badge>
-                                        </td>
-                                    </tr>
+                                    {bets.length > 0 ? (
+                                        bets.map((item, index) => (
+                                            <DashboardItem key={index} item={item} />
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" style={{ textAlign: "center", fontSize: "1.2rem", padding: "20px" }}>
+                                                No Winner records available
+                                            </td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </Table>
-
-                            <CardFooter className="py-4">
-                                <nav aria-label="...">
-                                    <Pagination
-                                    className="pagination justify-content-end mb-0"
-                                    listClassName="justify-content-end mb-0"
-                                    >
-                                    <PaginationItem className="disabled">
-                                        <PaginationLink
-                                        href="#pablo"
-                                        onClick={(e) => e.preventDefault()}
-                                        tabIndex="-1"
-                                        >
-                                        <i className="fas fa-angle-left" />
-                                        <span className="sr-only">Previous</span>
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem className="active">
-                                        <PaginationLink
-                                        href="#pablo"
-                                        onClick={(e) => e.preventDefault()}
-                                        >
-                                        1
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink
-                                        href="#pablo"
-                                        onClick={(e) => e.preventDefault()}
-                                        >
-                                        2 <span className="sr-only">(current)</span>
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink
-                                        href="#pablo"
-                                        onClick={(e) => e.preventDefault()}
-                                        >
-                                        3
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                    <PaginationItem>
-                                        <PaginationLink
-                                        href="#pablo"
-                                        onClick={(e) => e.preventDefault()}
-                                        >
-                                        <i className="fas fa-angle-right" />
-                                        <span className="sr-only">Next</span>
-                                        </PaginationLink>
-                                    </PaginationItem>
-                                    </Pagination>
-                                </nav>
-                            </CardFooter>
                         </Card>
                     </div>
                 </Row>

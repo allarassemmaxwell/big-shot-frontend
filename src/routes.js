@@ -20,6 +20,9 @@ import Winners from "views/examples/Winners.js";
 import Users from "views/examples/Users.js";
 import Login from "views/examples/Login.js";
 import Profile from "views/examples/Profile.js";
+import BetUsers from "views/examples/BetUsers";
+import Transactions from "views/examples/Transactions";
+import Sms from "views/examples/Sms";
 
 var routes = [
     {
@@ -37,8 +40,29 @@ var routes = [
         layout: "/admin",
     },
     {
-        path: "/users",
-        name: "Users",
+        path: "/transactions",
+        name: "Transactions",
+        icon: "ni ni-money-coins text-success",
+        component: <Transactions />,
+        layout: "/admin",
+    },
+    {
+        path: "/sms",
+        name: "Sms",
+        icon: "ni ni-send text-success",
+        component: <Sms />,
+        layout: "/admin",
+    },
+    {
+        path: "/bet-users",
+        name: "Bet Users",
+        icon: "ni ni-single-02 text-yellow",
+        component: <BetUsers />,
+        layout: "/admin",
+    },
+    {
+        path: "/admin-users",
+        name: "Admin Users",
         icon: "ni ni-single-02 text-yellow",
         component: <Users />,
         layout: "/admin",
