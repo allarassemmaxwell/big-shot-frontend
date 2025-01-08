@@ -19,6 +19,7 @@ import Index from "views/Index.js";
 import Winners from "views/examples/Winners.js";
 import Users from "views/examples/Users.js";
 import Login from "views/examples/Login.js";
+import Logout from "views/examples/Logout";
 import Profile from "views/examples/Profile.js";
 import BetUsers from "views/examples/BetUsers";
 import Transactions from "views/examples/Transactions";
@@ -76,9 +77,16 @@ var routes = [
     },
     {
         path: "/login",
-        name: "Log Out",
+        name: "Log In",
         icon: "ni ni-user-run text-red",
         component: <Login />,
+        layout: "/auth",
+    },
+    {
+        path: "/logout",
+        name: "Log Out",
+        icon: "ni ni-user-run text-red",
+        component: <Logout />,
         layout: "/auth",
     },
 ];

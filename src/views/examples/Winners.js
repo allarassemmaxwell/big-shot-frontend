@@ -22,11 +22,11 @@ import {
     CardHeader,
     Table,
     Container,
-    Row,
-    Col
+    Row
   } from "reactstrap";
-  import axios from 'axios';
-  import { BASE_URL, LOADING } from "constant";
+// import axios from 'axios';
+import axios from '../../utils/api';
+import { BASE_URL, LOADING } from "constant";
 import WinnerItem from "components/Winners/WinnerItem";
 import WinnerNavBar from "components/Winners/WinnerNavBar";
   // core components
