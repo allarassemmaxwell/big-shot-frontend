@@ -35,6 +35,9 @@ import {
 } from "reactstrap";
 
 const AdminNavbar = (props) => {
+     // Retrieve first name and last name from localStorage
+     const firstName = localStorage.getItem("first_name");
+     const lastName = localStorage.getItem("last_name");
     return (
         <>
             <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
@@ -68,9 +71,15 @@ const AdminNavbar = (props) => {
                                 />
                             </span>
                             <Media className="ml-2 d-none d-lg-block">
-                                <span className="mb-0 text-sm font-weight-bold">
-                                Jessica Jones
-                                </span>
+                                {firstName && lastName ? (
+                                    <span className="mb-0 text-sm font-weight-bold">
+                                        {firstName} {lastName}
+                                    </span>
+                                ) : (
+                                    <span className="mb-0 text-sm font-weight-bold">
+                                        Mame Missing
+                                    </span>
+                                )}
                             </Media>
                             </Media>
                         </DropdownToggle>

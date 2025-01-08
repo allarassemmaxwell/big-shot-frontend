@@ -26,14 +26,34 @@ import "assets/scss/argon-dashboard-react.scss";
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
 
+// Function to check if user is authenticated
+const isAuthenticated = () => !!localStorage.getItem("access_token");
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="/auth/*" element={<AuthLayout />} />
-      <Route path="*" element={<Navigate to="/admin/index" replace />} />
-    </Routes>
-  </BrowserRouter>
+    <BrowserRouter>
+        <Routes>
+        {/* Admin routes protected by authentication */}
+        <Route
+            path="/admin/*"
+            element={
+            isAuthenticated() ? <AdminLayout /> : <Navigate to="/auth/login" />
+            }
+        />
+        
+        {/* Auth routes (login, etc.) */}
+        <Route path="/auth/*" element={<AuthLayout />} />
+
+        {/* Redirect to admin dashboard if no matching route */}
+        <Route path="*" element={<Navigate to="/admin/index" replace />} />
+        </Routes>
+
+
+        {/* <Routes>
+            <Route path="/admin/*" element={<AdminLayout />} />
+            <Route path="/auth/*" element={<AuthLayout />} />
+            <Route path="*" element={<Navigate to="/admin/index" replace />} />
+        </Routes> */}
+    </BrowserRouter>
 );
