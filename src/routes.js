@@ -17,7 +17,7 @@
 */
 import Index from "views/Index.js";
 import Winners from "views/examples/Winners.js";
-import Users from "views/examples/Users.js";
+import AdminUsers from "views/examples/AdminUsers.js";
 import Login from "views/examples/Login.js";
 import Logout from "views/examples/Logout";
 import Profile from "views/examples/Profile.js";
@@ -65,7 +65,7 @@ var routes = [
         path: "/admin-users",
         name: "Admin Users",
         icon: "ni ni-single-02 text-yellow",
-        component: <Users />,
+        component: <AdminUsers />,
         layout: "/admin",
     },
     {

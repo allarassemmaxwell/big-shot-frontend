@@ -22,15 +22,17 @@ import { Button, Card, CardHeader, CardBody, FormGroup, Form, Input, InputGroupA
 import axios from "axios";
 import { LOADING } from "constant"; // Importing constants
 import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
+import { toast } from 'react-toastify';
+
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false); 
-    const [error, setError] = useState("");
 
     const navigate = useNavigate(); // Use navigate for redirect
     const location = useLocation(); // Get the current location
+    
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -42,19 +44,20 @@ const Login = () => {
                 email,
                 password,
             });
-
+    
+            // Store tokens and user data in localStorage
             localStorage.setItem("access_token", response.data.access);
             localStorage.setItem("refresh_token", response.data.refresh);
             localStorage.setItem("email", response.data.email);
             localStorage.setItem("first_name", response.data.first_name);
             localStorage.setItem("last_name", response.data.last_name);
 
-            // Redirect to the page the user tried to access
-            const redirectTo = location.state?.from || "/admin/index";
-            navigate(redirectTo); 
+            // Force a re-render to pick up localStorage changes
+            const redirectTo = location.state?.from?.pathname || "/admin/index";
+            console.log("Redirecting to:", redirectTo);
+            navigate(redirectTo, { replace: true });
         } catch (error) {
-            setError("Invalid credentials or something went wrong.");
-            alert(error.response?.data?.detail || "An error occurred");
+            toast.error('Invalid credentials or something went wrong.');
         } finally {
             setLoading(false);
         }

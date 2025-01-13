@@ -24,6 +24,11 @@ import AdminNavbar from "components/Navbars/AdminNavbar.js";
 import AdminFooter from "components/Footers/AdminFooter.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import 'sweetalert2/src/sweetalert2.scss';
+
 import routes from "routes.js";
 
 const Admin = (props) => {
@@ -62,6 +67,7 @@ const Admin = (props) => {
 
   return (
     <>
+      <ToastContainer />
       <Sidebar
         {...props}
         routes={routes}

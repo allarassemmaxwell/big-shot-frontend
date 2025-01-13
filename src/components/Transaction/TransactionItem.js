@@ -16,7 +16,7 @@ const TransactionItem = ({ item }) => {
                     >
                         <img
                         alt="..."
-                        src={require("../../assets/img/theme/profile-cover.jpg")}
+                        src={require("../../assets/img/brand/favicon.png")}
                         />
                     </a>
                     <Media>
