@@ -23,7 +23,8 @@ import { Container, Row } from "reactstrap";
 // core components
 import AuthNavbar from "components/Navbars/AuthNavbar.js";
 import AuthFooter from "components/Footers/AuthFooter.js";
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import routes from "routes.js";
 
 const Auth = (props) => {
@@ -56,6 +57,7 @@ const Auth = (props) => {
 
   return (
     <>
+    <ToastContainer />
       <div className="main-content" ref={mainContent}>
         <AuthNavbar />
         <div className="header bg-gradient-info py-7 py-lg-8">

@@ -16,7 +16,12 @@
 
 */
 // reactstrap components
-import React, { useEffect, useState } from "react";
+import axios from '../../utils/api';  // Adjust the relative path to your utils/api.js
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import WinnerItem from 'components/Winners/WinnerItem';
+import WinnerNavBar from 'components/Winners/WinnerNavBar';
+import { BASE_URL, LOADING } from 'constant';
 import {
     Card,
     CardHeader,
@@ -24,111 +29,95 @@ import {
     Container,
     Row
   } from "reactstrap";
-// import axios from 'axios';
-import axios from '../../utils/api';
-import { BASE_URL, LOADING } from "constant";
-import WinnerItem from "components/Winners/WinnerItem";
-import WinnerNavBar from "components/Winners/WinnerNavBar";
-  // core components
-  
-  const Winners = () => {
-    const [winners, setWinners] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const Winners = () => {
+  const [winners, setWinners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [uniqueWinners, setUniqueWinners] = useState(0);
+  const [totalStakes, setTotalStakes] = useState(0);
+  const [totalWonAmount, setTotalWonAmount] = useState(0);
+  const navigate = useNavigate();
 
-    // State for the counts of each SMS status
-    const [uniqueWinners, setUniqueWinners] = useState(0);
-    const [totalStakes, setTotalStakes] = useState(0);
-    const [totalWonAmount, setTotalWonAmount] = useState(0);
+  useEffect(() => {
+    const fetchSms = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/bets/`);
+        const betData = response.data;
 
-    useEffect(() => {
-        const fetchSms = async () => {
-            try {
-                const response = await axios.get(`${BASE_URL}/bets/`);
-                const betData = response.data;
+        const wonBets = betData.filter((bet) => bet.won);
 
-                // Filter bets where won is true
-                const wonBets = betData.filter((bet) => bet.won);
+        const uniqueWinnerNumbers = new Set(wonBets.map((bet) => bet.phone_number));
+        const totalStakesValue = wonBets.reduce(
+          (acc, bet) => acc + parseFloat(bet.stake),
+          0
+        );
+        const totalWonValue = wonBets.reduce(
+          (acc, bet) => acc + parseFloat(bet.won_amount),
+          0
+        );
 
-                // Calculate unique winners using a Set based on phone_number
-                const uniqueWinnerNumbers = new Set(wonBets.map((bet) => bet.phone_number));
+        setWinners(wonBets);
+        setUniqueWinners(uniqueWinnerNumbers.size);
+        setTotalStakes(totalStakesValue);
+        setTotalWonAmount(totalWonValue);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-                // Calculate total values
-                const totalStakesValue = wonBets.reduce(
-                    (acc, bet) => acc + parseFloat(bet.stake),
-                    0
-                );
-                const totalWonValue = wonBets.reduce(
-                    (acc, bet) => acc + parseFloat(bet.won_amount),
-                    0
-                );
+    fetchSms();
+  }, []);
 
-                // Update state
-                setWinners(wonBets);
-                setUniqueWinners(uniqueWinnerNumbers.size);
-                setTotalStakes(totalStakesValue);
-                setTotalWonAmount(totalWonValue);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchSms();
-    }, []);
+  if (loading) return <p>{LOADING}</p>;
+  if (error) return <p>Error: {error}</p>;
 
-    if (loading) return <p>{LOADING}</p>;
-    if (error) return <p>Error: {error}</p>;
-
-
-    return (
-        <>
-            <WinnerNavBar 
-            uniqueWinners={uniqueWinners}
-            totalStakes={totalStakes}
-            totalWonAmount={totalWonAmount}
-            />
-            {/* Page content */}
-            <Container className="mt--7" fluid>
-                {/* Table */}
-                <Row>
-                    <div className="col">
-                    <Card className="shadow">
-                        <CardHeader className="border-0">
-                            <h3 className="mb-0">Winners</h3>
-                        </CardHeader>
-                        <Table className="align-items-center table-flush" responsive>
-                            <thead className="thead-light">
-                                <tr>
-                                    <th scope="col">Phone Number</th>
-                                    <th scope="col">Chosen Box</th>
-                                    <th scope="col">Stake</th>
-                                    <th scope="col">Won Amount</th>
-                                    <th scope="col">Created At</th>
-                                    <th scope="col">Updated At</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {winners.length > 0 ? (
-                                    winners.map((item, index) => (
-                                        <WinnerItem key={index} item={item} />
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="4" style={{ textAlign: "center", fontSize: "1.2rem", padding: "20px" }}>
-                                            No Winner records available
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </Table>
-                    </Card>
-                    </div>
-                </Row>
-            </Container>
-        </>
-    );
+  return (
+    <>
+      <WinnerNavBar
+        uniqueWinners={uniqueWinners}
+        totalStakes={totalStakes}
+        totalWonAmount={totalWonAmount}
+      />
+      <Container className="mt--7" fluid>
+        <Row>
+          <div className="col">
+            <Card className="shadow">
+              <CardHeader className="border-0">
+                <h3 className="mb-0">Winners</h3>
+              </CardHeader>
+              <Table className="align-items-center table-flush" responsive>
+                <thead className="thead-light">
+                  <tr>
+                    <th scope="col">Phone Number</th>
+                    <th scope="col">Chosen Box</th>
+                    <th scope="col">Stake</th>
+                    <th scope="col">Won Amount</th>
+                    <th scope="col">Created At</th>
+                    <th scope="col">Updated At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {winners.length > 0 ? (
+                    winners.map((item, index) => (
+                      <WinnerItem key={index} item={item} />
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" style={{ textAlign: "center", fontSize: "1.2rem", padding: "20px" }}>
+                        No Winner records available
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+            </Card>
+          </div>
+        </Row>
+      </Container>
+    </>
+  );
 };
-  
-  export default Winners;
-  
+
+export default Winners;

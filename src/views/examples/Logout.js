@@ -1,11 +1,3 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-*/
-
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -16,10 +8,17 @@ const Logout = () => {
     useEffect(() => {
         const handleLogout = async () => {
             try {
-                // Call the logout API
+                // Retrieve refresh token from local storage
+                const refreshToken = localStorage.getItem("refresh_token");
+
+                if (!refreshToken) {
+                    throw new Error("No refresh token available");
+                }
+
+                // Call the logout API with the refresh token
                 await axios.post(
                     "http://127.0.0.1:8000/logout/",
-                    {},
+                    { refresh: refreshToken }, // Send refresh token in the body
                     {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem("access_token")}`,

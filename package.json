@@ -62,8 +62,11 @@
     "react-paginate": "^8.2.0",
     "react-router-dom": "6.21.1",
     "react-scripts": "5.0.1",
+    "react-sweetalert2": "^0.6.0",
+    "react-toastify": "^11.0.2",
     "reactstrap": "8.10.0",
-    "sass": "1.69.5"
+    "sass": "1.69.5",
+    "sweetalert2": "^11.15.10"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
