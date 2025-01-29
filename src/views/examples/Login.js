@@ -20,10 +20,9 @@
 import React, { useState } from "react";
 import { Button, Card, CardHeader, CardBody, FormGroup, Form, Input, InputGroupAddon, InputGroupText, InputGroup, Col } from "reactstrap";
 import axios from "axios";
-import { LOADING } from "constant"; // Importing constants
+import { BASE_URL, LOADING } from "constant";
 import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
 import { toast } from 'react-toastify';
-
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -40,7 +39,7 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post("http://127.0.0.1:8000/login/", {
+            const response = await axios.post(`${BASE_URL}/login/`, {
                 email,
                 password,
             });

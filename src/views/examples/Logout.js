@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { BASE_URL } from "constant";
 
 const Logout = () => {
     const navigate = useNavigate();
@@ -17,8 +18,8 @@ const Logout = () => {
 
                 // Call the logout API with the refresh token
                 await axios.post(
-                    "http://127.0.0.1:8000/logout/",
-                    { refresh: refreshToken }, // Send refresh token in the body
+                    `${BASE_URL}/logout/`,
+                    { refresh: refreshToken },
                     {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem("access_token")}`,

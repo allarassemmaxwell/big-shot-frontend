@@ -36,45 +36,45 @@ import {
 } from "reactstrap";
 
 const AdminNavbar = (props) => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      // Retrieve refresh token from local storage
-      const refreshToken = localStorage.getItem("refresh_token");
+    const handleLogout = async () => {
+        try {
+        // Retrieve refresh token from local storage
+        const refreshToken = localStorage.getItem("refresh_token");
 
-      if (!refreshToken) {
-        throw new Error("No refresh token available");
-      }
-
-      // Call the logout API with the refresh token
-      await axios.post(
-        "http://127.0.0.1:8000/logout/",
-        { refresh: refreshToken }, // Send refresh token in the body
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-          },
+        if (!refreshToken) {
+            throw new Error("No refresh token available");
         }
-      );
-    } catch (error) {
-      console.error("Logout failed:", error.response?.data || error.message);
-    } finally {
-      // Clear local storage
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      localStorage.removeItem("email");
-      localStorage.removeItem("first_name");
-      localStorage.removeItem("last_name");
 
-      // Redirect to login
-      navigate("/auth/login");
-    }
-  };
+        // Call the logout API with the refresh token
+        await axios.post(
+            "http://127.0.0.1:8000/api/logout/",
+            { refresh: refreshToken }, // Send refresh token in the body
+            {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+            }
+        );
+        } catch (error) {
+            console.error("Logout failed:", error.response?.data || error.message);
+        } finally {
+            // Clear local storage
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            localStorage.removeItem("email");
+            localStorage.removeItem("first_name");
+            localStorage.removeItem("last_name");
 
-  // Retrieve first name and last name from localStorage
-  const firstName = localStorage.getItem("first_name");
-  const lastName = localStorage.getItem("last_name");
+            // Redirect to login
+            navigate("/auth/login");
+        }
+    };
+
+    // Retrieve first name and last name from localStorage
+    const firstName = localStorage.getItem("first_name");
+    const lastName = localStorage.getItem("last_name");
 
   return (
     <>
@@ -126,12 +126,12 @@ const AdminNavbar = (props) => {
                   <h6 className="text-overflow m-0">Welcome!</h6>
                 </DropdownItem>
 
-                <DropdownItem to="/admin/user-profile" tag={Link}>
+                <DropdownItem to="/admin/profile" tag={Link}>
                   <i className="ni ni-single-02" />
                   <span>My profile</span>
                 </DropdownItem>
 
-                <DropdownItem to="/admin/password" tag={Link}>
+                <DropdownItem to="/admin/change-password" tag={Link}>
                   <i className="ni ni-key-25" />
                   <span>Password</span>
                 </DropdownItem>
@@ -139,7 +139,7 @@ const AdminNavbar = (props) => {
                 <DropdownItem divider />
 
                 {/* Add Logout handler */}
-                <DropdownItem href="#pablo" onClick={(e) => {
+                <DropdownItem onClick={(e) => {
                   e.preventDefault();
                   handleLogout();
                 }}>

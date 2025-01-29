@@ -44,28 +44,41 @@ const AdminUsers = () => {
     const [inactiveUsers, setInactiveUsers] = useState(0);
 
     const handleStatusChange = async (userId) => {
-        try {
-            const user = users.find(user => user.id === userId);
-            if (user) {
-                const updatedUser = { ...user, is_active: !user.is_active };
-                await axios.put(`${BASE_URL}/users/${userId}/`, updatedUser);
-                setUsers(prevUsers => prevUsers.map(u => u.id === userId ? updatedUser : u));
-                const activeUsersCount = users.filter(user => user.is_active).length;
-                const inactiveUsersCount = users.length - activeUsersCount;
-                setActiveUsers(activeUsersCount);
-                setInactiveUsers(inactiveUsersCount);
-                toast.success('User status change successfully.');
+        const user = users.find(user => user.id === userId);
+        if (!user) return;
+
+        Swal.fire({
+            title: `Are you sure you want to change the status of ${user.first_name} ${user.last_name}?`,
+            text: "This action is reversible.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, change it!',
+            cancelButtonText: 'Cancel'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const updatedUser = { ...user, is_active: !user.is_active };
+                    await axios.put(`${BASE_URL}/users/${userId}/`, updatedUser);
+                    setUsers(prevUsers => prevUsers.map(u => u.id === userId ? updatedUser : u));
+                    const activeUsersCount = users.filter(user => user.is_active).length;
+                    const inactiveUsersCount = users.length - activeUsersCount;
+                    setActiveUsers(activeUsersCount);
+                    setInactiveUsers(inactiveUsersCount);
+                    toast.success('User status changed successfully.');
+                } catch (err) {
+                    console.error('Failed to change the status', err);
+                    toast.error('Failed to change the status');
+                }
             }
-        } catch (err) {
-            console.error('Failed to update user status', err);
-            toast.error('Failed to update user status');
-        }
+        });
     };
 
     const handleDeleteUser = async (userId) => {
         const user = users.find(user => user.id === userId);
         if (!user) return;
-
+    
         Swal.fire({
             title: `Are you sure you want to delete ${user.first_name} ${user.last_name}?`,
             text: "This action cannot be undone.",
@@ -75,27 +88,23 @@ const AdminUsers = () => {
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, delete it!',
             cancelButtonText: 'Cancel'
-        }).then((result) => {
+        }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    axios.delete(`${BASE_URL}/users/${userId}/`);
+                    await axios.delete(`${BASE_URL}/users/${userId}/`);
                     setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
-    
-                    // Update counts after deletion
                     const activeUsersCount = users.filter(user => user.is_active).length;
                     const inactiveUsersCount = users.length - activeUsersCount;
                     setActiveUsers(activeUsersCount);
                     setInactiveUsers(inactiveUsersCount);
-    
-                    // Display success message
-                    Swal.fire('Deleted!', 'User has been deleted.', 'success');
+                    toast.success('User has been deleted successfully.');
                 } catch (err) {
                     console.error('Failed to delete user', err);
-                    Swal.fire('Error!', 'Failed to delete user.', 'error');
+                    toast.error('Failed to delete user.');
                 }
             }
         });
-    };
+    };    
     
     
 
@@ -122,7 +131,7 @@ const AdminUsers = () => {
             }
         };
         fetchUsers();
-    }, []);
+    }, [users]);
 
     if (loading) return <p>{LOADING}</p>;
     if (error) return <p>Error: {error}</p>;

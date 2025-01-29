@@ -40,6 +40,7 @@ import BetUserNavBar from "components/BetUsers/BetUserNavBar";
     const [totalUsers, setTotalUsers] = useState(0);
     const [totalWon, setTotalWon] = useState(0);
     const [totalLoss, setTotalLoss] = useState(0);
+    const [totalWithdrawn, setTotalWithdrawn] = useState(0);
     
     useEffect(() => {
         const fetchSms = async () => {
@@ -52,10 +53,13 @@ import BetUserNavBar from "components/BetUsers/BetUserNavBar";
                 const usersCount = betUserData.length;
                 const won = betUserData.reduce((sum, user) => sum + user.total_won, 0);
                 const loss = betUserData.reduce((sum, user) => sum + (user.total_stake - user.total_won), 0);
+                // Ensure to parse total_withdrawn as a number
+                const withdrawn = betUserData.reduce((sum, user) => sum + parseFloat(user.total_withdrawn), 0);
 
                 setTotalUsers(usersCount);
                 setTotalWon(won);
                 setTotalLoss(loss);
+                setTotalWithdrawn(withdrawn);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -74,6 +78,7 @@ import BetUserNavBar from "components/BetUsers/BetUserNavBar";
                 totalUsers={totalUsers}
                 totalWon={totalWon}
                 totalLoss={totalLoss}
+                totalWithdrawn={totalWithdrawn}
             />
 
             {/* Page content */}
@@ -91,6 +96,7 @@ import BetUserNavBar from "components/BetUsers/BetUserNavBar";
                                         <th scope="col">Phone Number</th>
                                         <th scope="col">Total Stakes</th>
                                         <th scope="col">Total Won</th>
+                                        <th scope="col">Total Withdrawals</th>
                                         <th scope="col">Created At</th>
                                         <th scope="col">Updated At</th>
                                     </tr>
@@ -103,7 +109,7 @@ import BetUserNavBar from "components/BetUsers/BetUserNavBar";
                                         ) : (
                                             <tr>
                                                 <td colSpan="4" style={{ textAlign: "center", fontSize: "1.2rem", padding: "20px" }}>
-                                                    No SMS records available
+                                                    No Bet Users records available
                                                 </td>
                                             </tr>
                                         )}

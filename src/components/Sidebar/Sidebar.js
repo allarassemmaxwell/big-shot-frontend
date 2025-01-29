@@ -29,57 +29,65 @@ import {
 var ps;
 
 const Sidebar = (props) => {
-  const [collapseOpen, setCollapseOpen] = useState();
-  
-  // verifies if routeName is the one active (in browser input)
-  const activeRoute = (routeName) => {
-    return props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
-  };
-
-  // toggles collapse between opened and closed (true/false)
-  const toggleCollapse = () => {
-    setCollapseOpen((data) => !data);
-  };
-
-  // closes the collapse
-  const closeCollapse = () => {
-    setCollapseOpen(false);
-  };
-
-  // creates the links that appear in the left menu / Sidebar
-  const createLinks = (routes) => {
-    return routes.map((prop, key) => {
-      return (
-        <NavItem key={key}>
-          <NavLink
-            to={prop.layout + prop.path}
-            tag={NavLinkRRD}
-            onClick={closeCollapse}
-          >
-            <i className={prop.icon} />
-            {prop.name}
-          </NavLink>
-        </NavItem>
-      );
-    });
-  };
-
-  // Filter routes to exclude the "Login" route
-  const filteredRoutes = props.routes.filter(route => route.path !== "/login");
-
-  const { bgColor, logo } = props;
-  let navbarBrandProps;
-  if (logo && logo.innerLink) {
-    navbarBrandProps = {
-      to: logo.innerLink,
-      tag: Link,
+    const [collapseOpen, setCollapseOpen] = useState();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    
+    // verifies if routeName is the one active (in browser input)
+    const activeRoute = (routeName) => {
+        return props.location.pathname.indexOf(routeName) > -1 ? "active" : "";
     };
-  } else if (logo && logo.outterLink) {
-    navbarBrandProps = {
-      href: logo.outterLink,
-      target: "_blank",
+
+    // toggles collapse between opened and closed (true/false)
+    const toggleCollapse = () => {
+        setCollapseOpen((data) => !data);
     };
-  }
+
+    // closes the collapse
+    const closeCollapse = () => {
+        setCollapseOpen(false);
+    };
+
+    // creates the links that appear in the left menu / Sidebar
+    const createLinks = (routes) => {
+        return routes.map((prop, key) => {
+            // Check if the route is Profile or Change Password
+        if (prop.path === "/profile" || prop.path === "/change-password") {
+            // Example condition: Only show these links if the user is logged in (you can modify this based on your needs)
+            if (!isLoggedIn) {
+                return null; // If not logged in, don't render the link
+            }
+        }
+        return (
+            <NavItem key={key}>
+            <NavLink
+                to={prop.layout + prop.path}
+                tag={NavLinkRRD}
+                onClick={closeCollapse}
+            >
+                <i className={prop.icon} />
+                {prop.name}
+            </NavLink>
+            </NavItem>
+        );
+        });
+    };
+
+    // Filter routes to exclude the "Login" route
+    const filteredRoutes = props.routes.filter(route => route.path !== "/login");
+
+    const { bgColor, logo } = props;
+    let navbarBrandProps;
+    if (logo && logo.innerLink) {
+        navbarBrandProps = {
+        to: logo.innerLink,
+        tag: Link,
+        };
+    } else if (logo && logo.outterLink) {
+        navbarBrandProps = {
+        href: logo.outterLink,
+        target: "_blank",
+        };
+    }
 
   return (
     <Navbar
