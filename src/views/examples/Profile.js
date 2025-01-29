@@ -69,26 +69,20 @@ const Profile = () => {
                 <div className="text-center">
                   <h3>
                     Jessica Jones
-                    <span className="font-weight-light">, 27</span>
                   </h3>
                   <div className="h5 font-weight-300">
                     <i className="ni location_pin mr-2" />
-                    Bucharest, Romania
+                    a@gmail.com
                   </div>
                   <div className="h5 mt-4">
                     <i className="ni business_briefcase-24 mr-2" />
-                    Solution Manager - Creative Tim Officer
+                    Phone Number: 254700000000
                   </div>
                   <div>
                     <i className="ni education_hat mr-2" />
-                    University of Computer Science
+                    Created at: 10/10/2025
                   </div>
                   <hr className="my-4" />
-                  <p>
-                    Ryan — the name taken by Melbourne-raised, Brooklyn-based
-                    Nick Murphy — writes, performs and records all of his own
-                    music.
-                  </p>
                 </div>
               </CardBody>
             </Card>
@@ -108,41 +102,7 @@ const Profile = () => {
                     User information
                   </h6>
                   <div className="pl-lg-4">
-                    <Row>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-username"
-                          >
-                            Username
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            defaultValue="lucky.jesse"
-                            id="input-username"
-                            placeholder="Username"
-                            type="text"
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col lg="6">
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Email address
-                          </label>
-                          <Input
-                            className="form-control-alternative"
-                            id="input-email"
-                            placeholder="jesse@example.com"
-                            type="email"
-                          />
-                        </FormGroup>
-                      </Col>
-                    </Row>
+                    
                     <Row>
                       <Col lg="6">
                         <FormGroup>
@@ -179,24 +139,45 @@ const Profile = () => {
                         </FormGroup>
                       </Col>
                     </Row>
+                    <Row>
+                      <Col lg="6">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-username"
+                          >
+                            Phone Number
+                          </label>
+                          <Input
+                            className="form-control-alternative"
+                            defaultValue="lucky.jesse"
+                            id="input-username"
+                            placeholder="Username"
+                            type="text"
+                          />
+                        </FormGroup>
+                      </Col>
+                      <Col lg="6">
+                        <FormGroup>
+                          <label
+                            className="form-control-label"
+                            htmlFor="input-email"
+                          >
+                            Email address
+                          </label>
+                          <Input
+                            className="form-control-alternative"
+                            id="input-email"
+                            placeholder="jesse@example.com"
+                            type="email"
+                          />
+                        </FormGroup>
+                      </Col>
+                    </Row>
                   </div>
 
                   <hr className="my-4" />
-                  {/* Description */}
-                  <h6 className="heading-small text-muted mb-4">About me</h6>
-                  <div className="pl-lg-4">
-                    <FormGroup>
-                      <label>About Me</label>
-                      <Input
-                        className="form-control-alternative"
-                        placeholder="A few words about you ..."
-                        rows="4"
-                        defaultValue="A beautiful Dashboard for Bootstrap 4. It is Free and
-                        Open Source."
-                        type="textarea"
-                      />
-                    </FormGroup>
-                  </div>
+                  
                 </Form>
               </CardBody>
             </Card>

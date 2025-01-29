@@ -24,6 +24,8 @@ import Profile from "views/examples/Profile.js";
 import BetUsers from "views/examples/BetUsers";
 import Transactions from "views/examples/Transactions";
 import Sms from "views/examples/Sms";
+import Withdrawal from "views/examples/Withdrawal";
+import ChangePassword from "views/examples/ChangePassword";
 
 var routes = [
     {
@@ -45,6 +47,13 @@ var routes = [
         name: "Transactions",
         icon: "ni ni-money-coins text-success",
         component: <Transactions />,
+        layout: "/admin",
+    },
+    {
+        path: "/withdrawals",
+        name: "Withdrawals",
+        icon: "ni ni-money-coins text-success",
+        component: <Withdrawal />,
         layout: "/admin",
     },
     {
@@ -73,6 +82,13 @@ var routes = [
         name: "Profile",
         icon: "ni ni-single-02 text-primary",
         component: <Profile />,
+        layout: "/admin",
+    },
+    {
+        path: "/change-password",
+        name: "Change Password",
+        icon: "ni ni-key-25 text-primary",
+        component: <ChangePassword />,
         layout: "/admin",
     },
     {

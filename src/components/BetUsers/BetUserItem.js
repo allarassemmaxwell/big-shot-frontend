@@ -24,10 +24,13 @@ const BetUserItem = ({ item }) => {
                 </Media>
             </th>
             <td>
-                KSH {item.total_stake}
+                KSH {item.total_stake.toFixed(2)}
             </td>
             <td>
-                KSH {item.total_won}
+                KSH {item.total_won.toFixed(2)}
+            </td>
+            <td>
+                KSH {item.total_withdrawn}
             </td>
             <td>
                 <Badge color="" className="badge-dot mr-4">

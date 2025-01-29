@@ -28,6 +28,12 @@ const DashboardItem = ({item}) => {
                     {item.chosen_box}
                 </td>
                 <td>
+                    KSH {item.stake}
+                </td>
+                <td>
+                    KSH {item.won_amount}
+                </td>
+                <td>
                     <Badge color="" className="badge-dot mr-4">
                     <i
                         className={
@@ -36,12 +42,6 @@ const DashboardItem = ({item}) => {
                     />
                     {item.won ? 'Won' : 'Lost'}
                     </Badge>
-                </td>
-                <td>
-                    KSH {item.stake}
-                </td>
-                <td>
-                    KSH {item.won_amount}
                 </td>
                 <td>
                     <Badge color="" className="badge-dot mr-4">
