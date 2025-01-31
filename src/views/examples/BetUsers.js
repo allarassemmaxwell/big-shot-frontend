@@ -24,7 +24,7 @@ import {
     Row,
 } from "reactstrap";
 import React, { useEffect, useState } from "react";
-import axios from 'axios';
+import axios from './../../utils/api';
 import { BASE_URL, LOADING } from "constant";
 import BetUserItem from "components/BetUsers/BetUserItem";
 import BetUserNavBar from "components/BetUsers/BetUserNavBar";

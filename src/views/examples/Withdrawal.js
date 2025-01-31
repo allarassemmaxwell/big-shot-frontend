@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Card, CardHeader, Container, Row, Badge, Button, Input } from "reactstrap";
-import axios from 'axios';
-import { BASE_URL, LOADING } from "constant";
+import React, { useEffect, useState } from "react";
+import { Card, CardHeader, Container, Row, Input } from "reactstrap";
+import axios from './../../utils/api';
+import { BASE_URL } from "constant";
 import WithdrawalNavBar from "components/Withdrawal/WithdrawalNavBar";
-import formatDate from "utils/formatDate";
 import DataTable from 'react-data-table-component';
-import * as XLSX from 'xlsx';
+import ExportToExcel from "components/ExportToExcel/ExportToExcel";
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+import WithdrawnTableColumn from "components/Withdrawal/WithdrawnTableColumn";
 
 // Chart.js imports
 import { Bar } from 'react-chartjs-2';
@@ -18,7 +19,6 @@ import {
     Tooltip,
     Legend,
 } from 'chart.js';
-
 // Register chart components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -32,13 +32,6 @@ const Withdrawal = () => {
         labels: [],
         datasets: [],
     }); // Ensure chartData is always initialized
-
-    // State for the counts of each SMS status
-    const [completedCount, setCompletedCount] = useState(0);
-    const [pendingCount, setPendingCount] = useState(0);
-    const [failedCount, setFailedCount] = useState(0);
-
-    const tableRef = useRef();
 
     // Function to filter based on time period
     const filterByTimePeriod = (data, period) => {
@@ -114,67 +107,25 @@ const Withdrawal = () => {
         fetchWithdrawals();
     }, [timePeriod]); // Re-run useEffect when the timePeriod changes
 
-    if (loading) return <p>{LOADING}</p>;
+    if (loading) return <LoadingSpinner />;
     if (error) return <p>Error: {error}</p>;
 
-    // Columns configuration for DataTable
-    const columns = [
-        { name: 'Phone Number', selector: row => row.phone_number, sortable: true },
-        { name: 'Service Code', selector: row => row.service_code, sortable: true },
-        { name: 'Reference', selector: row => row.transaction_id, sortable: true },
-        { name: 'Stake', selector: row => `Ksh ${parseFloat(row.bet_stake).toLocaleString()}`, sortable: true },
-        { name: 'Won Amount', selector: row => `Ksh ${parseFloat(row.amount).toLocaleString()}`, sortable: true },
-        { 
-            name: 'Status', 
-            selector: row => (
-                <td>
-                    <Badge color="" className="badge-dot mr-4">
-                        <i
-                            className={
-                                row.status === "Pending" ? "bg-yellow" : 
-                                row.status === "Completed" ? "bg-success" : "bg-danger"
-                            }
-                        />
-                        {row.status}
-                    </Badge>
-                </td>
-            ),
-            sortable: true 
-        },
-        { name: 'Created At', selector: row => formatDate(row.created_at), sortable: true },
-        { name: 'Updated At', selector: row => formatDate(row.updated_at), sortable: true },
-    ];
+    const columns = WithdrawnTableColumn();
 
-    // Export to Excel
-    const exportToExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(withdrawals);
-        const wb = { Sheets: { 'Withdrawals': ws }, SheetNames: ['Withdrawals'] };
-        const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+    // Calculate total number of unique users and total amount
+    const totalUsers = new Set(filteredWithdrawals.map(item => item.phone_number)).size;
+    const totalAmount = filteredWithdrawals.reduce((acc, item) => acc + parseFloat(item.amount), 0);
 
-        const buffer = new ArrayBuffer(excelFile.length);
-        const view = new Uint8Array(buffer);
-        for (let i = 0; i < excelFile.length; i++) {
-            view[i] = excelFile.charCodeAt(i) & 0xFF;
-        }
-
-        const blob = new Blob([buffer], { type: 'application/octet-stream' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'withdrawals.xlsx';
-        a.click();
-    };
     return (
         <>
             <WithdrawalNavBar
-                completedCount={completedCount}
-                pendingCount={pendingCount}
-                failedCount={failedCount}
+                totalUsers={totalUsers}
+                totalAmount={totalAmount}
             />
 
             {/* Page content */}
             <Container className="mt--7" fluid>
-                <Row>
+                <Row className="mb-5">
                     {/* Graph */}
                     <div className="col-md-9">
                         <Card className="shadow">
@@ -229,21 +180,22 @@ const Withdrawal = () => {
                 <Row>
                     <div className="col">
                         <Card className="shadow">
-                        <CardHeader className="bg-transparent border-0">
+                            <CardHeader className="bg-transparent border-0">
                                 <h3 className="mb-0">Withdrawals</h3>
-                                {/* Add Export buttons */}
                                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                                    <button onClick={exportToExcel} className="btn btn-primary">Export to Excel</button>
+                                    <ExportToExcel data={filteredWithdrawals} filename="withdraw.xlsx" />
                                 </div>
                             </CardHeader>
-                            <div ref={tableRef}>
+                            <div>
                                 <DataTable
                                     title="Withdrawals List"
                                     columns={columns}
                                     data={filteredWithdrawals}
                                     pagination
+                                    paginationPerPage={50}
+                                    paginationRowsPerPageOptions={[10, 25, 50, 100]}
                                     highlightOnHover
-                                    searchable={true}
+                                    searchable
                                     fixedHeader
                                 />
                             </div>
@@ -253,6 +205,6 @@ const Withdrawal = () => {
             </Container>
         </>
     );
-}
+};
 
 export default Withdrawal;
