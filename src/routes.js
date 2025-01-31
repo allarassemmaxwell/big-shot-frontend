@@ -16,7 +16,6 @@
 
 */
 import Index from "views/Index.js";
-import Winners from "views/examples/Winners.js";
 import AdminUsers from "views/examples/AdminUsers.js";
 import Login from "views/examples/Login.js";
 import Logout from "views/examples/Logout";
@@ -33,13 +32,6 @@ var routes = [
         name: "Dashboard",
         icon: "ni ni-tv-2 text-primary",
         component: <Index />,
-        layout: "/admin",
-    },
-    {
-        path: "/winners",
-        name: "Winners",
-        icon: "ni ni-trophy text-success",
-        component: <Winners />,
         layout: "/admin",
     },
     {

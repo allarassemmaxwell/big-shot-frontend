@@ -1,78 +1,67 @@
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from 'constant';
 
-axios.defaults.baseURL = 'http://127.0.0.1:8000/'; // Set the base URL for API requests
+// Create a custom axios instance
+const instance = axios.create({
+    baseURL: BASE_URL,  // Replace with your actual API base URL
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
 
-// Define a custom hook for handling token refresh and navigation
-const useTokenRefresh = () => {
-  const navigate = useNavigate();
-
-  // Function to refresh tokens
-  const refreshToken = async () => {
-    try {
-      const refreshToken = localStorage.getItem("refresh_token");
-
-      if (!refreshToken) {
-        throw new Error("No refresh token available");
-      }
-
-      const response = await axios.post('/token/refresh/', { refresh: refreshToken });
-
-      localStorage.setItem("access_token", response.data.access);
-      localStorage.setItem("refresh_token", response.data.refresh);
-
-      return response.data.access;  // Return new access token
-
-    } catch (error) {
-      console.error("Token refresh failed:", error.response?.data || error.message);
-      return null;  // Indicate token refresh failure
-    }
-  };
-
-  return { navigate, refreshToken };
-};
-
-// Axios request interceptor to handle token refresh
-axios.interceptors.request.use(
-  async (config) => {
-    const accessToken = localStorage.getItem("access_token");
-
-    if (accessToken) {
-      config.headers['Authorization'] = `Bearer ${accessToken}`;
-    }
-
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-axios.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    const { navigate, refreshToken } = useTokenRefresh();
-
-    // Check if error status is 401 (Unauthorized) and if refresh token exists
-    if (error.response.status === 401 && originalRequest.url === '/token/refresh/') {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      navigate("/auth/login");
-      return Promise.reject(error);
-    }
-
-    if (error.response.status === 401 && originalRequest.url !== '/token/refresh/') {
-      const newAccessToken = await refreshToken();
-
-      if (newAccessToken) {
-        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-        return axios(originalRequest);
-      } else {
+// Add a request interceptor to include the access token with every request
+instance.interceptors.request.use(
+    (config) => {
+        const accessToken = localStorage.getItem('access_token');
+        if (accessToken) {
+            config.headers['Authorization'] = `Bearer ${accessToken}`;
+        }
+        return config;
+    },
+    (error) => {
         return Promise.reject(error);
-      }
     }
-
-    return Promise.reject(error);
-  }
 );
 
-export default axios;
+// Add a response interceptor to handle token refreshing
+instance.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+        const originalRequest = error.config;
+
+            // Handle 401 error - token expired
+            if (error.response && error.response.status === 401 && !originalRequest._retry) {
+                originalRequest._retry = true;
+
+                const refreshToken = localStorage.getItem('refresh_token');
+                
+                if (refreshToken) {
+                    try {
+                        const response = await axios.post(`${BASE_URL}/token/refresh/`, { refresh: refreshToken });
+                        const newAccessToken = response.data.access;
+                        const newRefreshToken = response.data.refresh;
+                        
+                        // Store new tokens
+                        localStorage.setItem('access_token', newAccessToken);
+                        localStorage.setItem('refresh_token', newRefreshToken);
+
+                        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+
+                        // Retry the original request
+                        return instance(originalRequest);
+                    } catch (refreshError) {
+                        console.error('Token refresh failed:', refreshError.response?.data || refreshError.message);
+                        localStorage.removeItem('access_token');
+                        localStorage.removeItem('refresh_token');
+                        localStorage.removeItem("email");
+                        localStorage.removeItem("first_name");
+                        localStorage.removeItem("last_name");
+                        window.location.href = '/auth/login';  // You can use `navigate` here instead (see below for that solution)
+                    }
+                }
+            }
+        return Promise.reject(error);
+    }
+);
+
+export default instance;

@@ -19,9 +19,9 @@
 // reactstrap components
 import React, { useState } from "react";
 import { Button, Card, CardHeader, CardBody, FormGroup, Form, Input, InputGroupAddon, InputGroupText, InputGroup, Col } from "reactstrap";
-import axios from "axios";
+import axios from './../../utils/api';
 import { BASE_URL, LOADING } from "constant";
-import { useNavigate, useLocation } from "react-router-dom"; // Import useNavigate and useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from 'react-toastify';
 
 const Login = () => {

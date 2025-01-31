@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardHeader, Container, Row, Input, Badge } from "reactstrap";
-import axios from 'axios';
-import { BASE_URL, LOADING } from "../constant";
-import * as XLSX from 'xlsx';
+import { Card, CardHeader, Container, Row, Input } from "reactstrap";
+import axios from './../utils/api';
+import { BASE_URL } from "../constant";
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import DashboardNavBar from "components/Dashboard/DashboardNavBar";
-import DashboardItem from "components/Dashboard/DashboardItem";
-import DataTable from 'react-data-table-component'; // Import DataTable component
-import formatDate from "utils/formatDate";
+import DataTable from 'react-data-table-component'; 
+import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+import BetsTableColumns from "components/Dashboard/BetsTableColumns";
+import ExportToExcel from "components/ExportToExcel/ExportToExcel";
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Index = (props) => {
-    const [bets, setBets] = useState([]);
     const [filteredBets, setFilteredBets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -24,7 +23,13 @@ const Index = (props) => {
     const [uniqueWinners, setUniqueWinners] = useState(0);
     const [totalStakes, setTotalStakes] = useState(0);
     const [totalWonAmount, setTotalWonAmount] = useState(0);
+    const [totalProfit, setTotalProfit] = useState(0);
+
+    // Define columns using the BetsTableColumns component
+    const columns = BetsTableColumns();
+    
     const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+    const [chartData2, setChartData2] = useState({ labels: [], datasets: [] });
 
     // Function to filter data by selected time period
     const filterByTimePeriod = (data, period) => {
@@ -47,23 +52,53 @@ const Index = (props) => {
         });
     };
 
-    // Function to aggregate bets by service_code
+    // Function to aggregate bets by service_code for total stake (lost bets)
     const aggregateBetsByServiceCode = (data) => {
         const aggregated = data.reduce((acc, item) => {
-            if (acc[item.service_code]) {
-                acc[item.service_code].total_won += parseFloat(item.won_amount);
-            } else {
-                acc[item.service_code] = { service_code: item.service_code, total_won: parseFloat(item.won_amount) };
+            if (!item.won) { // Consider only lost bets
+                if (acc[item.service_code]) {
+                    acc[item.service_code].total_stake += parseFloat(item.stake); // Add stake for lost bets
+                } else {
+                    acc[item.service_code] = { service_code: item.service_code, total_stake: parseFloat(item.stake) };
+                }
             }
             return acc;
         }, {});
 
         const chartData = Object.values(aggregated).map(item => ({
             service_code: item.service_code,
-            total_won: item.total_won,
+            total_stake: item.total_stake,
         }));
 
         return chartData;
+    };
+
+    // Function to aggregate bets by service_code for total won amount (won bets)
+    const aggregateWonAmountByServiceCode = (data) => {
+        const aggregated = data.reduce((acc, item) => {
+            if (item.won) { // Consider only won bets
+                if (acc[item.service_code]) {
+                    acc[item.service_code].total_won_amount += parseFloat(item.won_amount); // Add won_amount for won bets
+                } else {
+                    acc[item.service_code] = { service_code: item.service_code, total_won_amount: parseFloat(item.won_amount) };
+                }
+            }
+            return acc;
+        }, {});
+
+        const chartData = Object.values(aggregated).map(item => ({
+            service_code: item.service_code,
+            total_won_amount: item.total_won_amount,
+        }));
+
+        return chartData;
+    };
+
+    // Function to calculate the Total Profit (Total stake where won is false)
+    const calculateTotalProfit = (data) => {
+        return data
+            .filter((item) => !item.won) // Filter only lost bets
+            .reduce((acc, item) => acc + parseFloat(item.stake), 0); // Sum up the stakes
     };
 
     // Fetch bets and filter by selected time period
@@ -77,8 +112,11 @@ const Index = (props) => {
                 const filteredData = filterByTimePeriod(betData, timePeriod);
                 setFilteredBets(filteredData);
 
-                // Aggregate bets by service_code
+                // Aggregate bets by service_code (only lost bets)
                 const aggregatedData = aggregateBetsByServiceCode(filteredData);
+                
+                // Aggregate won amount by service_code (only won bets)
+                const aggregatedWonAmountData = aggregateWonAmountByServiceCode(filteredData);
 
                 // Calculate metrics
                 const wonBets = filteredData.filter((bet) => bet.won);
@@ -92,17 +130,36 @@ const Index = (props) => {
                     0
                 );
 
+                const totalProfitValue = calculateTotalProfit(filteredData); // Calculate Total Profit (lost bets stake)
+
                 setUniqueWinners(uniqueWinnerNumbers.size);
                 setTotalStakes(totalStakesValue);
                 setTotalWonAmount(totalWonValue);
 
-                // Prepare chart data for total won amount by service_code
+                // Set Total Profit value
+                setTotalProfit(totalProfitValue);
+
+                // Prepare chart data for total stake for lost bets by service_code
                 setChartData({
                     labels: aggregatedData.map(item => item.service_code),
                     datasets: [
                         {
+                            label: 'Total Profit per Service Code',
+                            data: aggregatedData.map(item => item.total_stake),
+                            backgroundColor: ['#42a5f5', '#ffeb3b', '#f44336'],
+                            borderColor: ['#1e88e5', '#fbc02d', '#d32f2f'],
+                            borderWidth: 1,
+                        },
+                    ],
+                });
+
+                // Prepare chart data for total won amount for won bets by service_code
+                setChartData2({
+                    labels: aggregatedWonAmountData.map(item => item.service_code),
+                    datasets: [
+                        {
                             label: 'Total Won Amount per Service Code',
-                            data: aggregatedData.map(item => item.total_won),
+                            data: aggregatedWonAmountData.map(item => item.total_won_amount),
                             backgroundColor: ['#42a5f5', '#ffeb3b', '#f44336'],
                             borderColor: ['#1e88e5', '#fbc02d', '#d32f2f'],
                             borderWidth: 1,
@@ -119,62 +176,8 @@ const Index = (props) => {
         fetchBets();
     }, [timePeriod]);
 
-    if (loading) return <p>{LOADING}</p>;
+    if (loading) return <LoadingSpinner />;
     if (error) return <p>Error: {error}</p>;
-
-    // Columns for the DataTable
-    const columns = [
-        { name: 'Phone Number', selector: row => row.phone_number, sortable: true },
-        { name: 'Service Code', selector: row => row.service_code, sortable: true },
-        { name: 'Chosen Box', selector: row => row.chosen_box, sortable: true },
-        { name: 'Stake', selector: row => `Ksh ${parseFloat(row.stake).toLocaleString()}`, sortable: true },
-        { name: 'Status', selector: row => (
-            <Badge color="" className="badge-dot mr-4">
-                <i className={row.won ? "bg-success" : "bg-danger"} />
-                {row.won ? "Won" : "Lost"}
-            </Badge>
-        ), sortable: true },
-        { name: 'Won Amount', selector: row => `Ksh ${parseFloat(row.won_amount).toLocaleString()}`, sortable: true },
-        { 
-            name: 'Withdrawn', 
-            selector: row => (
-                <td>
-                    <Badge color="" className="badge-dot mr-4">
-                        <i
-                            className={
-                                row.withdrawal_status === "Pending" ? "bg-yellow" : 
-                                row.withdrawal_status === "Withdrawn" ? "bg-success" : "bg-danger"
-                            }
-                        />
-                        {row.withdrawal_status}
-                    </Badge>
-                </td>
-            ),
-            sortable: true 
-        },
-        { name: 'Created At', selector: row => formatDate(row.created_at), sortable: true },
-        // { name: 'Updated At', selector: row => formatDate(row.updated_at), sortable: true },
-    ];
-
-    // Export to Excel functionality
-    const exportToExcel = () => {
-        const ws = XLSX.utils.json_to_sheet(filteredBets);
-        const wb = { Sheets: { 'Bets': ws }, SheetNames: ['Bets'] };
-        const excelFile = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-
-        const buffer = new ArrayBuffer(excelFile.length);
-        const view = new Uint8Array(buffer);
-        for (let i = 0; i < excelFile.length; i++) {
-            view[i] = excelFile.charCodeAt(i) & 0xFF;
-        }
-
-        const blob = new Blob([buffer], { type: 'application/octet-stream' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'bets.xlsx';
-        a.click();
-    };
 
     return (
         <>
@@ -182,40 +185,13 @@ const Index = (props) => {
                 uniqueWinners={uniqueWinners}
                 totalStakes={totalStakes}
                 totalWonAmount={totalWonAmount}
+                totalProfit={totalProfit}
             />
 
             <Container className="mt--7" fluid>
-                <Row>
-                    {/* Graph Section */}
-                    <div className="col-md-9">
-                        <Card className="shadow">
-                            <CardHeader className="bg-transparent border-0">
-                                <h3 className="mb-0">Total Won Amount per Service Code</h3>
-                            </CardHeader>
-                            <div className="p-3">
-                                <Bar
-                                    data={chartData}
-                                    options={{
-                                        responsive: true,
-                                        plugins: {
-                                            title: {
-                                                display: true,
-                                                text: 'Total Won Amount per Service Code',
-                                            },
-                                        },
-                                        scales: {
-                                            y: {
-                                                beginAtZero: true,
-                                            },
-                                        },
-                                    }}
-                                />
-                            </div>
-                        </Card>
-                    </div>
-
+                <Row  className="mb-5">
                     {/* Time Period Filter Section */}
-                    <div className="col-md-3">
+                    <div className="col-md-3 ml-auto">
                         <Card className="shadow">
                             <CardHeader className="bg-transparent border-0">
                                 <h3 className="mb-0">Filter by Time Period</h3>
@@ -235,7 +211,65 @@ const Index = (props) => {
                         </Card>
                     </div>
                 </Row>
+                <Row className="mb-5">
+                    {/* Total Profit per Service Code Graph */}
+                    <div className="col-md-6">
+                        <Card className="shadow">
+                            <CardHeader className="bg-transparent border-0">
+                                <h3 className="mb-0">Total Profit per Service Code</h3>
+                            </CardHeader>
+                            <div className="p-3">
+                                <Bar
+                                    data={chartData}
+                                    options={{
+                                        responsive: true,
+                                        plugins: {
+                                            title: {
+                                                display: true,
+                                                text: 'Total Profit per Service Code',
+                                            },
+                                        },
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                            },
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </Card>
+                    </div>
 
+                    {/* Total Won Amount per Service Code Graph */}
+                    <div className="col-md-6">
+                        <Card className="shadow">
+                            <CardHeader className="bg-transparent border-0">
+                                <h3 className="mb-0">Total Won Amount per Service Code</h3>
+                            </CardHeader>
+                            <div className="p-3">
+                                <Bar
+                                    data={chartData2}
+                                    options={{
+                                        responsive: true,
+                                        plugins: {
+                                            title: {
+                                                display: true,
+                                                text: 'Total Won Amount per Service Code',
+                                            },
+                                        },
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                            },
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </Card>
+                    </div>
+                </Row>
+
+                
                 {/* Data Table Section */}
                 <Row>
                     <div className="col">
@@ -243,7 +277,7 @@ const Index = (props) => {
                             <CardHeader className="bg-transparent border-0">
                                 <h3 className="mb-0">Bets</h3>
                                 <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                                    <button onClick={exportToExcel} className="btn btn-primary">Export to Excel</button>
+                                    <ExportToExcel data={filteredBets} filename="bets.xlsx" />
                                 </div>
                             </CardHeader>
                             <div>
@@ -252,6 +286,8 @@ const Index = (props) => {
                                     columns={columns}
                                     data={filteredBets}
                                     pagination
+                                    paginationPerPage={50}
+                                    paginationRowsPerPageOptions={[10, 25, 50, 100]}
                                     highlightOnHover
                                     searchable
                                     fixedHeader

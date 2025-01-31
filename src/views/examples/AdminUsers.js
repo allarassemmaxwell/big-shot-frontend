@@ -24,7 +24,7 @@ import {
     Container,
     Row
 } from "reactstrap";
-import axios from 'axios';
+import axios from './../../utils/api';
 import { BASE_URL, LOADING } from "constant";
 import AdminUsersItem from "components/AdminUsers/AdminUsersItem";
 import AdminUsersNavbar from "components/AdminUsers/AdminUsersNavbar";
