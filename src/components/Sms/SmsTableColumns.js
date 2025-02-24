@@ -36,8 +36,27 @@ const SmsTableColumns = ({ handleRowClick }) => {
           </td>
         ),
         sortable: true
-      },
-      
+    },
+    {
+        name: 'Result',
+            selector: row => (
+                <td>
+                    <Badge color="" className="badge-dot mr-4">
+                        <i
+                        className={
+                            row.result === "Bet Lost"
+                            ? "bg-yellow"
+                            : row.result === "Bet Won"
+                            ? "bg-success"
+                            : "bg-danger"
+                        }
+                        />
+                        {row.result}
+                    </Badge>
+                </td>
+            ),
+            sortable: true
+    },
     { name: 'Created At', selector: row => formatDate(row.created_at), sortable: true },
     { name: 'Updated At', selector: row => formatDate(row.updated_at), sortable: true },
     {

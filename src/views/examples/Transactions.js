@@ -5,11 +5,11 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import DataTable from 'react-data-table-component';
 import axios from './../../utils/api';
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+// import LoadingSpinner from "components/LoadingSpinner/";
 import ExportToExcel from "components/ExportToExcel/ExportToExcel";
 import TransactionNavBar from "components/Transaction/TransactionNavBar";
 import TransactionTableColumns from "components/Transaction/TransactionTableColumns";
-
+import { toast } from 'react-toastify';
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -17,7 +17,6 @@ const Transactions = () => {
     const [transactions, setTransactions] = useState([]);
     const [filteredTransactions, setFilteredTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [timePeriod, setTimePeriod] = useState('daily');
     const [totalUsers, setTotalUsers] = useState(0); // For the total number of unique users (phone numbers)
     const [totalAmount, setTotalAmount] = useState(0); // For the total amount sum
@@ -87,7 +86,7 @@ const Transactions = () => {
                     ],
                 });
             } catch (err) {
-                setError(err.message);
+                toast.error(`Error: ${err.message}`);
             } finally {
                 setLoading(false);
             }
@@ -96,8 +95,7 @@ const Transactions = () => {
         fetchTransactions();
     }, [timePeriod]);
 
-    if (loading) return <LoadingSpinner />;
-    if (error) return <p>Error: {error}</p>;
+    // if (loading) return <LoadingSpinner />;
 
     const columns = TransactionTableColumns();
 

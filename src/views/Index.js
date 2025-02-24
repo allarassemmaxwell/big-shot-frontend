@@ -6,9 +6,10 @@ import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import DashboardNavBar from "components/Dashboard/DashboardNavBar";
 import DataTable from 'react-data-table-component'; 
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+// import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
 import BetsTableColumns from "components/Dashboard/BetsTableColumns";
 import ExportToExcel from "components/ExportToExcel/ExportToExcel";
+import { toast } from 'react-toastify';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -16,7 +17,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 const Index = (props) => {
     const [filteredBets, setFilteredBets] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [timePeriod, setTimePeriod] = useState('daily');
 
     // State for metrics
@@ -167,7 +167,7 @@ const Index = (props) => {
                     ],
                 });
             } catch (err) {
-                setError(err.message);
+                toast.error(`Error: ${err.message}`);
             } finally {
                 setLoading(false);
             }
@@ -176,8 +176,7 @@ const Index = (props) => {
         fetchBets();
     }, [timePeriod]);
 
-    if (loading) return <LoadingSpinner />;
-    if (error) return <p>Error: {error}</p>;
+    // if (loading) return <LoadingSpinner />;
 
     return (
         <>

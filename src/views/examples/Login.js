@@ -20,9 +20,11 @@
 import React, { useState } from "react";
 import { Button, Card, CardHeader, CardBody, FormGroup, Form, Input, InputGroupAddon, InputGroupText, InputGroup, Col } from "reactstrap";
 import axios from './../../utils/api';
-import { BASE_URL, LOADING } from "constant";
+import { BASE_URL } from "constant";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from 'react-toastify';
+import LoadingSpinner from "components/LoadingSpinner/";
+// import { setEncryptedItem } from './utils/localStorageUtils'; // import the utility
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -43,13 +45,17 @@ const Login = () => {
                 email,
                 password,
             });
-    
+            
+            // Store encrypted tokens and user data in localStorage
+            // setEncryptedItem("access_token", response.data.access);
+
             // Store tokens and user data in localStorage
             localStorage.setItem("access_token", response.data.access);
             localStorage.setItem("refresh_token", response.data.refresh);
             localStorage.setItem("email", response.data.email);
             localStorage.setItem("first_name", response.data.first_name);
             localStorage.setItem("last_name", response.data.last_name);
+            localStorage.setItem("phone_number", response.data.phone_number);
 
             // Force a re-render to pick up localStorage changes
             const redirectTo = location.state?.from?.pathname || "/admin/index";
@@ -115,7 +121,7 @@ const Login = () => {
                         type="submit"
                         disabled={loading}
                     >
-                        {loading ? LOADING : "Sign in"}
+                        {loading ? <LoadingSpinner /> : "Sign in"}
                     </Button>
                     </div>
                 </Form>
