@@ -5,9 +5,9 @@ import { BASE_URL } from "constant";
 import WithdrawalNavBar from "components/Withdrawal/WithdrawalNavBar";
 import DataTable from 'react-data-table-component';
 import ExportToExcel from "components/ExportToExcel/ExportToExcel";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+// import LoadingSpinner from "components/LoadingSpinner/";
 import WithdrawnTableColumn from "components/Withdrawal/WithdrawnTableColumn";
-
+import { toast } from 'react-toastify';
 // Chart.js imports
 import { Bar } from 'react-chartjs-2';
 import {
@@ -26,7 +26,6 @@ const Withdrawal = () => {
     const [withdrawals, setWithdrawals] = useState([]);
     const [filteredWithdrawals, setFilteredWithdrawals] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [timePeriod, setTimePeriod] = useState('daily'); // New state for time filter
     const [chartData, setChartData] = useState({
         labels: [],
@@ -99,7 +98,7 @@ const Withdrawal = () => {
                     ],
                 });
             } catch (err) {
-                setError(err.message);
+                toast.error(`Error: ${err.message}`);
             } finally {
                 setLoading(false);
             }
@@ -107,8 +106,7 @@ const Withdrawal = () => {
         fetchWithdrawals();
     }, [timePeriod]); // Re-run useEffect when the timePeriod changes
 
-    if (loading) return <LoadingSpinner />;
-    if (error) return <p>Error: {error}</p>;
+    // if (loading) return <LoadingSpinner />;
 
     const columns = WithdrawnTableColumn();
 

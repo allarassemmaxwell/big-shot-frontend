@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { BASE_URL } from 'constant';
+// import { getDecryptedItem, removeItem } from './utils/localStorageUtils'; // import the utility
 
 // Create a custom axios instance
 const instance = axios.create({
@@ -12,6 +13,7 @@ const instance = axios.create({
 // Add a request interceptor to include the access token with every request
 instance.interceptors.request.use(
     (config) => {
+        // const accessToken = getDecryptedItem("access_token");
         const accessToken = localStorage.getItem('access_token');
         if (accessToken) {
             config.headers['Authorization'] = `Bearer ${accessToken}`;
@@ -51,6 +53,7 @@ instance.interceptors.response.use(
                         return instance(originalRequest);
                     } catch (refreshError) {
                         console.error('Token refresh failed:', refreshError.response?.data || refreshError.message);
+                        // removeItem("access_token");
                         localStorage.removeItem('access_token');
                         localStorage.removeItem('refresh_token');
                         localStorage.removeItem("email");

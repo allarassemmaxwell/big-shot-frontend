@@ -13,15 +13,15 @@ import {
 import axios from './../../utils/api';
 import { BASE_URL } from "constant";
 import SmsNavBar from "components/Sms/SmsNavBar";
-import LoadingSpinner from "components/LoadingSpinner/LoadingSpinner";
+// import LoadingSpinner from "components/LoadingSpinner/";
 import DataTable from 'react-data-table-component';
 import SmsTableColumns from "components/Sms/SmsTableColumns";
+import { toast } from 'react-toastify';
 
 
 const Sms = () => {
   const [sms, setSms] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   // State for the counts of each SMS status
   const [sentCount, setSentCount] = useState(0);
@@ -32,30 +32,30 @@ const Sms = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState("");
 
-  useEffect(() => {
-    const fetchSms = async () => {
-      try {
-        const response = await axios.get(`${BASE_URL}/sms/`);
-        const smsData = response.data;
-        setSms(smsData);
+    useEffect(() => {
+        const fetchSms = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/sms/`);
+            const smsData = response.data;
+            setSms(smsData);
 
-        // Count the status of SMS messages
-        const sent = smsData.filter((item) => item.status === "Sent").length;
-        const pending = smsData.filter((item) => item.status === "Pending").length;
-        const failed = smsData.filter((item) => item.status === "Failed").length;
+            // Count the status of SMS messages
+            const sent = smsData.filter((item) => item.status === "Sent").length;
+            const pending = smsData.filter((item) => item.status === "Pending").length;
+            const failed = smsData.filter((item) => item.status === "Failed").length;
 
-        // Update the state with the counts
-        setSentCount(sent);
-        setPendingCount(pending);
-        setFailedCount(failed);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSms();
-  }, []);
+            // Update the state with the counts
+            setSentCount(sent);
+            setPendingCount(pending);
+            setFailedCount(failed);
+        } catch (err) {
+            toast.error(`Error: ${err.message}`);
+        } finally {
+            setLoading(false);
+        }
+        };
+        fetchSms();
+    }, []);
 
   const handleRowClick = (message) => {
     setSelectedMessage(message);
@@ -65,8 +65,7 @@ const Sms = () => {
   // Pass the handleRowClick function to SmsTableColumns
   const columns = SmsTableColumns({ handleRowClick });
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return <p>Error: {error}</p>;
+  // if (loading) return <LoadingSpinner />;
 
   return (
     <>

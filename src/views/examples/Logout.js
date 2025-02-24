@@ -35,6 +35,7 @@ const Logout = () => {
                 localStorage.removeItem("email");
                 localStorage.removeItem("first_name");
                 localStorage.removeItem("last_name");
+                localStorage.removeItem("phone_number");
 
                 // Redirect to login
                 navigate("/auth/login");

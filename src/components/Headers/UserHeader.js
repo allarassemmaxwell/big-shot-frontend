@@ -19,7 +19,7 @@
 // reactstrap components
 import { Container, Row, Col } from "reactstrap";
 
-const UserHeader = () => {
+const UserHeader = ({email, first_name, last_name}) => {
   return (
     <>
       <div
@@ -37,11 +37,10 @@ const UserHeader = () => {
         {/* Header container */}
         <Container className="d-flex align-items-center" fluid>
           <Row>
-            <Col lg="7" md="10">
-              <h1 className="display-2 text-white">Hello Jesse</h1>
+            <Col lg="12" md="12">
+              <h1 className="display-2 text-white">{first_name || first_name? `${first_name} ${last_name}`: 'Name Missing'}</h1>
               <p className="text-white mt-0 mb-5">
-                This is your profile page. You can see the progress you've made
-                with your work and manage your projects or assigned tasks
+                {email}
               </p>
             </Col>
           </Row>
