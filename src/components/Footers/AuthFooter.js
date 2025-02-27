@@ -1,21 +1,3 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Meziz Bet (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Meziz Bet
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-/*eslint-disable*/
 
 // reactstrap components
 import { NavItem, NavLink, Nav, Container, Row, Col } from "reactstrap";
@@ -31,10 +13,8 @@ const Login = () => {
                                 © {new Date().getFullYear()}{" "}
                                 <a
                                 className="font-weight-bold ml-1"
-                                href="#"
-                                target="_blank"
                                 >
-                                    Meziz Bet
+                                    Big Shot Solutions
                                 </a>
                             </div>
                         </Col>
@@ -42,8 +22,6 @@ const Login = () => {
                             <Nav className="nav-footer justify-content-center justify-content-xl-end">
                                 <NavItem>
                                     <NavLink
-                                        href="#"
-                                        target="_blank"
                                     >
                                         Developed By Nel Roy
                                     </NavLink>

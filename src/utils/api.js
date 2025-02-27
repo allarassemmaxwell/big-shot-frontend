@@ -59,7 +59,7 @@ instance.interceptors.response.use(
                         localStorage.removeItem("email");
                         localStorage.removeItem("first_name");
                         localStorage.removeItem("last_name");
-                        window.location.href = '/auth/login';  // You can use `navigate` here instead (see below for that solution)
+                        window.location.href = '/';  // You can use `navigate` here instead (see below for that solution)
                     }
                 }
             }
