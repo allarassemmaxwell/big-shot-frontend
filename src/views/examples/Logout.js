@@ -6,6 +6,7 @@ import { BASE_URL } from "constant";
 const Logout = () => {
     const navigate = useNavigate();
 
+    
     useEffect(() => {
         const handleLogout = async () => {
             try {
@@ -38,7 +39,7 @@ const Logout = () => {
                 localStorage.removeItem("phone_number");
 
                 // Redirect to login
-                navigate("/auth/login");
+                navigate("/");
             }
         };
 

@@ -51,7 +51,7 @@ const Sidebar = (props) => {
     const createLinks = (routes) => {
         return routes.map((prop, key) => {
             // Check if the route is Profile or Change Password
-        if (prop.path === "/profile" || prop.path === "/change-password") {
+        if (prop.path === "/profile" || prop.path === "/change-password" || prop.path === '/') {
             // Example condition: Only show these links if the user is logged in (you can modify this based on your needs)
             if (!isLoggedIn) {
                 return null; // If not logged in, don't render the link
@@ -59,14 +59,14 @@ const Sidebar = (props) => {
         }
         return (
             <NavItem key={key}>
-            <NavLink
-                to={prop.layout + prop.path}
-                tag={NavLinkRRD}
-                onClick={closeCollapse}
-            >
-                <i className={prop.icon} />
-                {prop.name}
-            </NavLink>
+                <NavLink
+                    to={prop.layout + prop.path}
+                    tag={NavLinkRRD}
+                    onClick={closeCollapse}
+                >
+                    <i className={prop.icon} />
+                    {prop.name}
+                </NavLink>
             </NavItem>
         );
         });
@@ -116,7 +116,7 @@ const Sidebar = (props) => {
         ) : null}
         {/* User */}
         <Nav className="align-items-center d-md-none">
-          <UncontrolledDropdown nav>
+          {/* <UncontrolledDropdown nav>
             <DropdownToggle nav className="nav-link-icon">
               <i className="ni ni-bell-55" />
             </DropdownToggle>
@@ -130,14 +130,14 @@ const Sidebar = (props) => {
               <DropdownItem divider />
               <DropdownItem>Something else here</DropdownItem>
             </DropdownMenu>
-          </UncontrolledDropdown>
+          </UncontrolledDropdown> */}
           <UncontrolledDropdown nav>
             <DropdownToggle nav>
               <Media className="align-items-center">
                 <span className="avatar avatar-sm rounded-circle">
                   <img
                     alt="..."
-                    src={require("../../assets/img/theme/team-1-800x800.jpg")}
+                    src={require("../../assets/img/brand/favicon.png")}
                   />
                 </span>
               </Media>
@@ -150,11 +150,16 @@ const Sidebar = (props) => {
                 <i className="ni ni-single-02" />
                 <span>My profile</span>
               </DropdownItem>
+              <DropdownItem to="/admin/change-password" tag={Link}>
+                <i className="ni ni-key-25" />
+                <span>Password</span>
+            </DropdownItem>
+
               <DropdownItem divider />
-              <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
+              {/* <DropdownItem href="#pablo" onClick={(e) => e.preventDefault()}>
                 <i className="ni ni-user-run" />
                 <span>Logout</span>
-              </DropdownItem>
+              </DropdownItem> */}
             </DropdownMenu>
           </UncontrolledDropdown>
         </Nav>
@@ -188,22 +193,6 @@ const Sidebar = (props) => {
               </Col>
             </Row>
           </div>
-          {/* Form */}
-          <Form className="mt-4 mb-3 d-md-none">
-            <InputGroup className="input-group-rounded input-group-merge">
-              <Input
-                aria-label="Search"
-                className="form-control-rounded form-control-prepended"
-                placeholder="Search"
-                type="search"
-              />
-              <InputGroupAddon addonType="prepend">
-                <InputGroupText>
-                  <span className="fa fa-search" />
-                </InputGroupText>
-              </InputGroupAddon>
-            </InputGroup>
-          </Form>
           {/* Navigation */}
           <Nav navbar>{createLinks(filteredRoutes)}</Nav>
           {/* Divider */}
@@ -234,5 +223,6 @@ Sidebar.propTypes = {
     imgAlt: PropTypes.string.isRequired,
   }),
 };
+
 
 export default Sidebar;

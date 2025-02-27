@@ -1,43 +1,24 @@
-/*!
 
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+
 import {
   DropdownMenu,
   DropdownItem,
   UncontrolledDropdown,
   DropdownToggle,
-  Form,
-  FormGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Input,
-  InputGroup,
   Navbar,
   Nav,
   Container,
   Media,
 } from "reactstrap";
+import { BASE_URL } from "constant";
 
 const AdminNavbar = (props) => {
     const navigate = useNavigate();
 
+    
     const handleLogout = async () => {
         try {
         // Retrieve refresh token from local storage
@@ -46,11 +27,8 @@ const AdminNavbar = (props) => {
         if (!refreshToken) {
             throw new Error("No refresh token available");
         }
-
         // Call the logout API with the refresh token
-        await axios.post(
-            "http://127.0.0.1:8000/api/logout/",
-            { refresh: refreshToken }, // Send refresh token in the body
+        await axios.post(`${BASE_URL}/logout/`, { refresh: refreshToken },
             {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -68,7 +46,7 @@ const AdminNavbar = (props) => {
             localStorage.removeItem("last_name");
 
             // Redirect to login
-            navigate("/auth/login");
+            navigate("/");
         }
     };
 
@@ -82,22 +60,10 @@ const AdminNavbar = (props) => {
         <Container fluid>
           <Link
             className="h4 mb-0 text-white text-uppercase d-none d-lg-inline-block"
-            to="/"
+            to="/admin"
           >
             {props.brandText}
           </Link>
-          <Form className="navbar-search navbar-search-dark form-inline mr-3 d-none d-md-flex ml-lg-auto">
-            <FormGroup className="mb-0">
-              <InputGroup className="input-group-alternative">
-                <InputGroupAddon addonType="prepend">
-                  <InputGroupText>
-                    <i className="fas fa-search" />
-                  </InputGroupText>
-                </InputGroupAddon>
-                <Input placeholder="Search" type="text" />
-              </InputGroup>
-            </FormGroup>
-          </Form>
           <Nav className="align-items-center d-none d-md-flex" navbar>
             <UncontrolledDropdown nav>
               <DropdownToggle className="pr-0" nav>
@@ -139,13 +105,13 @@ const AdminNavbar = (props) => {
                 <DropdownItem divider />
 
                 {/* Add Logout handler */}
-                <DropdownItem onClick={(e) => {
+                {/* <DropdownItem onClick={(e) => {
                   e.preventDefault();
                   handleLogout();
                 }}>
                   <i className="ni ni-user-run" />
                   <span>Logout</span>
-                </DropdownItem>
+                </DropdownItem> */}
               </DropdownMenu>
             </UncontrolledDropdown>
           </Nav>

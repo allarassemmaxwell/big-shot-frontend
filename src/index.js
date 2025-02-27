@@ -1,20 +1,4 @@
-/*!
 
-=========================================================
-* Argon Dashboard React - v1.2.4
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2024 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
@@ -38,22 +22,22 @@ root.render(
         <Route
             path="/admin/*"
             element={
-            isAuthenticated() ? <AdminLayout /> : <Navigate to="/auth/login" />
+            isAuthenticated() ? <AdminLayout /> : <Navigate to="/" />
             }
         />
         
         {/* Auth routes (login, etc.) */}
-        <Route path="/auth/*" element={<AuthLayout />} />
+        <Route path="/*" element={<AuthLayout />} />
 
         {/* Redirect to admin dashboard if no matching route */}
-        <Route path="*" element={<Navigate to="/admin/index" replace />} />
+        <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>
 
 
         {/* <Routes>
             <Route path="/admin/*" element={<AdminLayout />} />
             <Route path="/auth/*" element={<AuthLayout />} />
-            <Route path="*" element={<Navigate to="/admin/index" replace />} />
+            <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes> */}
     </BrowserRouter>
 );
